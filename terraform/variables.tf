@@ -15,3 +15,9 @@ variable "stage_tag" {
   default     = "dev"
   description = "The variable is used for the stage tag for all objects that will be created and for prefixes in the names"
 }
+
+variable "kuber_version" {
+  type        = string
+  default     = "1.21"
+  description = "Kubernetes version for EKS cluster"
+}

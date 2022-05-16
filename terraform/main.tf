@@ -15,3 +15,17 @@ module "network" {
   stage_tag    = var.stage_tag
 }
 
+module "security" {
+  source       = "./modules/security"
+  stage_tag    = var.stage_tag
+  default_tags = local.default_tags
+}
+
+
+module "eks" {
+  source             = "./modules/eks"
+  subnet_ids         = values(module.network.public_networks)[*].id
+  cluster_role_arn   = module.security.cluster_role_arn
+  cluster_name       = local.cluster_name
+  kuber_version      = var.kuber_version
+}
