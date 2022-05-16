@@ -23,9 +23,12 @@ module "security" {
 
 
 module "eks" {
-  source             = "./modules/eks"
-  subnet_ids         = values(module.network.public_networks)[*].id
-  cluster_role_arn   = module.security.cluster_role_arn
-  cluster_name       = local.cluster_name
-  kuber_version      = var.kuber_version
+  source            = "./modules/eks"
+  public_subnet_ids = values(module.network.public_networks)[*].id
+  cluster_role_arn  = module.security.cluster_role_arn
+  cluster_name      = local.cluster_name
+  kuber_version     = var.kuber_version
+
+  private_subnet_ids = values(module.network.private_networks)[*].id
+  node_role_arn      = module.security.node_role_arn
 }
