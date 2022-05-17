@@ -7,12 +7,16 @@ resource "aws_eks_node_group" "this" {
   version         = var.kuber_version
 
   scaling_config {
-    desired_size = 1
-    max_size     = 1
-    min_size     = 1
+    desired_size = var.nodes_desired_size
+    max_size     = var.nodes_max_size
+    min_size     = var.nodes_min_size
   }
 
   depends_on = [
     aws_eks_cluster.this
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

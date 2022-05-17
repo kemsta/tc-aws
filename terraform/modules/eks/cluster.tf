@@ -8,7 +8,7 @@ resource "aws_eks_cluster" "this" {
     endpoint_public_access  = true
     endpoint_private_access = true
     subnet_ids              = var.public_subnet_ids
-    security_group_ids      = var.security_group_ids
+    security_group_ids      = var.eks_control_plane_sg_ids
   }
 
   tags = var.default_tags

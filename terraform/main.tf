@@ -17,8 +17,10 @@ module "network" {
 
 module "security" {
   source       = "./modules/security"
+  vpc_id       = module.network.vpc_id
   stage_tag    = var.stage_tag
   default_tags = local.default_tags
+  cluster_name = local.cluster_name
 }
 
 
@@ -31,4 +33,7 @@ module "eks" {
 
   private_subnet_ids = values(module.network.private_networks)[*].id
   node_role_arn      = module.security.node_role_arn
+
+  eks_workers_agents_sg_ids = [module.security.eks_workers_agents_sg.id]
+  eks_control_plane_sg_ids  = [module.security.eks_control_plane_sg.id]
 }

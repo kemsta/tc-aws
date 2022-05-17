@@ -23,6 +23,11 @@ resource "aws_iam_role_policy_attachment" "this-AmazonEKSClusterPolicy" {
   role       = aws_iam_role.cluster.name
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonEKSVPCCNIRole" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.cluster.name
+}
+
 resource "aws_iam_role" "node" {
   assume_role_policy = <<POLICY
 {

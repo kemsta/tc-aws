@@ -35,14 +35,36 @@ variable "private_subnet_ids" {
 }
 
 
-variable "security_group_ids" {
+variable "eks_workers_agents_sg_ids" {
   type        = list(string)
-  default     = []
-  description = "Security groups for EKS cluster"
+  description = "Security groups for agents workers"
+}
+
+variable "eks_control_plane_sg_ids" {
+  type        = list(string)
+  description = "Security groups for control plane"
 }
 
 variable "instance_types" {
   type        = list(string)
   default     = ["c5.large"]
   description = "Instance types for kubernetes workers"
+}
+
+variable "nodes_desired_size" {
+  type        = number
+  default     = 2
+  description = "Desired size for autoscale node group"
+}
+
+variable "nodes_min_size" {
+  type        = number
+  default     = 2
+  description = "Min size for autoscale node group"
+}
+
+variable "nodes_max_size" {
+  type        = number
+  default     = 4
+  description = "Max size for autoscale node group"
 }
