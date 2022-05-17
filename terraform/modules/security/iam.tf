@@ -48,6 +48,50 @@ POLICY
   })
 }
 
+resource "aws_iam_policy" "efs_policy" {
+  name = "AmazonEKS_EFS_CSI_Driver_Policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "elasticfilesystem:DescribeAccessPoints",
+          "elasticfilesystem:DescribeFileSystems"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "elasticfilesystem:CreateAccessPoint"
+        ],
+        Resource = "*",
+        Condition = {
+          StringLike = {
+            "aws:RequestTag/efs.csi.aws.com/cluster" = "true"
+          }
+        }
+      },
+      {
+        Effect   = "Allow",
+        Action   = "elasticfilesystem:DeleteAccessPoint",
+        Resource = "*",
+        Condition = {
+          StringEquals = {
+            "aws:ResourceTag/efs.csi.aws.com/cluster" = "true"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "node-AmazonEKS_EFS_CSI_Driver_Policy" {
+  policy_arn = aws_iam_policy.efs_policy.arn
+  role       = aws_iam_role.node.name
+}
+
 resource "aws_iam_role_policy_attachment" "node-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.node.name

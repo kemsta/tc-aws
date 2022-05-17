@@ -10,3 +10,7 @@ output "db_host" {
 output "db_port" {
   value = module.storage.db_port
 }
+
+output "efs_id" {
+  value = module.storage.efs_id
+}
