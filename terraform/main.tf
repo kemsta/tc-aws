@@ -37,3 +37,12 @@ module "eks" {
   eks_workers_agents_sg_ids = [module.security.eks_workers_agents_sg.id]
   eks_control_plane_sg_ids  = [module.security.eks_control_plane_sg.id]
 }
+
+module "storage" {
+  source                    = "./modules/storage"
+  stage_tag                 = var.stage_tag
+  default_tags              = local.default_tags
+  subnet_ids                = values(module.network.private_networks)[*].id
+  source_security_group_ids = [module.eks.EKS_CLuster.vpc_config[0].cluster_security_group_id]
+  vpc_id                    = module.network.vpc_id
+}
