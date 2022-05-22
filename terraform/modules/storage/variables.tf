@@ -9,20 +9,14 @@ variable "default_tags" {
   default = {}
 }
 
-variable "subnet_ids" {
-  type        = list(string)
-  description = "Subnets where will be rolled postgres"
-}
-
-variable "source_security_group_ids" {
-  type        = list(string)
-  description = "Allowed sgs for postgres"
+variable "private_networks" {
+  type        = map(any)
+  description = "Subnets where will be rolled up storages"
 }
 
 variable "vpc_id" {
   type = string
 }
-
 
 variable "db_allocated_storage" {
   type        = number

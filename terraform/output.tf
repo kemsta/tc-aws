@@ -3,14 +3,14 @@ output "db_password" {
   sensitive = true
 }
 
-output "db_host" {
-  value = module.storage.db_host
+output "db_endpoint" {
+  value = module.storage.db_endpoint
 }
 
-output "db_port" {
-  value = module.storage.db_port
+output "server_pods_sg" {
+  value = module.security.server_pods_sg
 }
 
-output "efs_id" {
-  value = module.storage.efs_id
+output "agents_pods_sg" {
+  value = module.security.agent_pods_sg
 }

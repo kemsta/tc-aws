@@ -15,34 +15,47 @@ module "network" {
   stage_tag    = var.stage_tag
 }
 
-module "security" {
-  source       = "./modules/security"
-  vpc_id       = module.network.vpc_id
-  stage_tag    = var.stage_tag
-  default_tags = local.default_tags
-  cluster_name = local.cluster_name
-}
+module "storage" {
+  source           = "./modules/storage"
+  stage_tag        = var.stage_tag
+  default_tags     = local.default_tags
+  private_networks = module.network.private_networks
+  vpc_id           = module.network.vpc_id
 
+  db_allocated_storage     = var.db_allocated_storage
+  db_max_allocated_storage = var.db_max_allocated_storage
+  db_engine_version        = var.db_engine_version
+  db_instance_class        = var.db_instance_class
+}
 
 module "eks" {
-  source            = "./modules/eks"
-  public_subnet_ids = values(module.network.public_networks)[*].id
-  cluster_role_arn  = module.security.cluster_role_arn
-  cluster_name      = local.cluster_name
-  kuber_version     = var.kuber_version
+  source        = "./modules/eks"
+  cluster_name  = local.cluster_name
+  kuber_version = var.kuber_version
 
-  private_subnet_ids = values(module.network.private_networks)[*].id
-  node_role_arn      = module.security.node_role_arn
+  public_networks  = module.network.public_networks
+  private_networks = module.network.private_networks
 
-  eks_workers_agents_sg_ids = [module.security.eks_workers_agents_sg.id]
-  eks_control_plane_sg_ids  = [module.security.eks_control_plane_sg.id]
+  efs_id = module.storage.efs_id
+
+  instance_types     = var.instance_types
+  nodes_desired_size = var.nodes_desired_size
+  nodes_min_size     = var.nodes_min_size
+  nodes_max_size     = var.nodes_max_size
+
+  kube_proxy_version     = var.kube_proxy_version
+  vpc_cni_version        = var.vpc_cni_version
+  coredns_version        = var.coredns_version
+  ebs_csi_driver_version = var.ebs_csi_driver_version
 }
 
-module "storage" {
-  source                    = "./modules/storage"
-  stage_tag                 = var.stage_tag
-  default_tags              = local.default_tags
-  subnet_ids                = values(module.network.private_networks)[*].id
-  source_security_group_ids = [module.eks.EKS_CLuster.vpc_config[0].cluster_security_group_id]
-  vpc_id                    = module.network.vpc_id
+module "security" {
+  source         = "./modules/security"
+  vpc_id         = module.network.vpc_id
+  stage_tag      = var.stage_tag
+  default_tags   = local.default_tags
+  cluster_name   = local.cluster_name
+  cluster_sg_id  = module.eks.cluster.vpc_config[0].cluster_security_group_id
+  postgres_sg_id = module.storage.postgres_sg_id
+  efs_sg_id      = module.storage.efs_sg_id
 }

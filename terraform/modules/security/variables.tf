@@ -17,3 +17,18 @@ variable "cluster_name" {
 variable "vpc_id" {
   type = string
 }
+
+variable "cluster_sg_id" {
+  type        = string
+  description = "Cluster security group ID" // https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html#cluster-sg
+}
+
+variable "postgres_sg_id" {
+  type        = string
+  description = "Database security group ID"
+}
+
+variable "efs_sg_id" {
+  type        = string
+  description = "EFS security group ID"
+}

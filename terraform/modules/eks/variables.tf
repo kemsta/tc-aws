@@ -8,41 +8,20 @@ variable "cluster_name" {
   description = "Name of EKS cluster. It's needed for shared networks label for EKS"
 }
 
-variable "cluster_role_arn" {
-  type        = string
-  description = "Arn for cluster role with AmazonEKSClusterPolicyt"
-}
-
-variable "node_role_arn" {
-  type        = string
-  description = "Arn for cluster role with AmazonEKSClusterPolicyt"
-}
-
 variable "kuber_version" {
   type        = string
   default     = "1.21"
   description = "Kubernetes version for EKS cluster"
 }
 
-variable "public_subnet_ids" {
-  type        = list(string)
+variable "public_networks" {
+  type        = map(any)
   description = "Subnets where will be rolled up EKS master nodes"
 }
 
-variable "private_subnet_ids" {
-  type        = list(string)
+variable "private_networks" {
+  type        = map(any)
   description = "Subnets where will be rolled up EKS worker nodes"
-}
-
-
-variable "eks_workers_agents_sg_ids" {
-  type        = list(string)
-  description = "Security groups for agents workers"
-}
-
-variable "eks_control_plane_sg_ids" {
-  type        = list(string)
-  description = "Security groups for control plane"
 }
 
 variable "instance_types" {
@@ -67,4 +46,41 @@ variable "nodes_max_size" {
   type        = number
   default     = 4
   description = "Max size for autoscale node group"
+}
+
+variable "kube_proxy_version" {
+  type    = string
+  default = "v1.21.2-eksbuild.2"
+}
+
+variable "vpc_cni_version" {
+  type    = string
+  default = "v1.10.1-eksbuild.1"
+}
+
+variable "coredns_version" {
+  type    = string
+  default = "v1.8.4-eksbuild.1"
+}
+
+variable "ebs_csi_driver_version" {
+  type    = string
+  default = "v1.6.1-eksbuild.1"
+}
+
+variable "efs_id" {
+  type        = string
+  description = "Id of efs for shared storage class"
+}
+
+variable "stage_tag" {
+  type        = string
+  default     = "dev"
+  description = "The variable is used for the stage tag for all objects that will be created and for prefixes in the names"
+}
+
+variable "public_access_cidrs" {
+  type        = string
+  default     = "0.0.0.0/0"
+  description = "List of CIDR blocks. Indicates which CIDR blocks can access the Amazon EKS public API server endpoint"
 }

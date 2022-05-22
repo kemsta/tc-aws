@@ -1,0 +1,9 @@
+storageClasses:
+    - name: efs-sc
+      mountOptions:
+      - tls
+      parameters:
+        provisioningMode: efs-ap
+        fileSystemId: ${efs_id}
+        directoryPerms: "700"
+        basePath: "/dynamic"
