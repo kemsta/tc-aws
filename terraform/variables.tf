@@ -51,8 +51,8 @@ variable "kuber_version" {
 }
 
 variable "public_access_cidrs" {
-  type        = string
-  default     = "0.0.0.0/0"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
   description = "List of CIDR blocks. Indicates which CIDR blocks can access the Amazon EKS public API server endpoint"
 }
 

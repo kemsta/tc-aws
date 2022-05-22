@@ -62,7 +62,9 @@ resource "aws_iam_policy" "efs_policy" {
         Effect = "Allow",
         Action = [
           "elasticfilesystem:DescribeAccessPoints",
-          "elasticfilesystem:DescribeFileSystems"
+          "elasticfilesystem:DescribeFileSystems",
+          "elasticfilesystem:DescribeMountTargets",
+          "ec2:DescribeAvailabilityZones"
         ],
         Resource = "*"
       },

@@ -2,6 +2,7 @@ storageClasses:
     - name: efs-sc
       mountOptions:
       - tls
+      reclaimPolicy: Retain
       parameters:
         provisioningMode: efs-ap
         fileSystemId: ${efs_id}
