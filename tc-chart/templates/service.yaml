@@ -1,0 +1,14 @@
+{{- $fullName := include "tc-server.fullname" $ -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/app: {{  $fullName }}-server
+    {{- include "tc-server.selectorLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      port: 8111
+      targetPort: 8111

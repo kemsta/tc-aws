@@ -1,6 +1,6 @@
 resource "aws_eks_node_group" "this" {
-  cluster_name    = var.cluster_name
-  node_group_name = "${var.cluster_name}-nodes"
+  cluster_name    = aws_eks_cluster.this.name
+  node_group_name = "${aws_eks_cluster.this.name}-nodes"
   node_role_arn   = aws_iam_role.node.arn
   instance_types  = var.instance_types
   subnet_ids      = values(var.private_networks)[*].id

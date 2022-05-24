@@ -32,13 +32,6 @@ resource "aws_eks_addon" "vpc-cni" {
   resolve_conflicts = "OVERWRITE"
 }
 
-resource "aws_eks_addon" "coredns" {
-  addon_name        = "coredns"
-  addon_version     = var.coredns_version
-  cluster_name      = aws_eks_cluster.this.name
-  resolve_conflicts = "OVERWRITE"
-}
-
 data "aws_eks_cluster_auth" "this" {
   name = aws_eks_cluster.this.name
 }
@@ -104,7 +97,7 @@ resource "kubernetes_job" "vpc-cni-set-env" {
         container {
           name    = "vpc-cni-set-env"
           image   = "bitnami/kubectl:latest"
-          command = ["/bin/sh", "-c", "kubectl set env daemonset aws-node -n kube-system ENABLE_POD_ENI=true POD_SECURITY_GROUP_ENFORCING_MODE=standard"]
+          command = ["/bin/sh", "-c", "kubectl set env daemonset aws-node -n kube-system ENABLE_POD_ENI=true POD_SECURITY_GROUP_ENFORCING_MODE=standard DISABLE_TCP_EARLY_DEMUX=true"]
         }
         restart_policy = "Never"
       }

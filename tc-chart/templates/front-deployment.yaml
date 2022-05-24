@@ -1,0 +1,59 @@
+{{- $fullName := include "tc-server.fullname" $ -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-front
+  labels:
+    {{- include "tc-server.labels" . | nindent 4 }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      {{- include "tc-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/front-configmap.yaml") . | sha256sum }}
+      labels:
+        app.kubernetes.io/component : front
+        {{- include "tc-server.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $fullName }}-front
+            # An array of keys from the ConfigMap to create as files
+            items:
+            - key: "haproxy.cfg"
+              path: "haproxy.cfg"
+      containers:
+        - name: {{ .Chart.Name }}-front
+          image: "{{ .Values.front_image.repository }}:{{ .Values.front_image.tag }}"
+          imagePullPolicy: {{ $.Values.front_image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: "/usr/local/etc/haproxy/"
+              readOnly: true
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/app
+                      operator: In
+                      values: 
+                      - {{ $fullName }}-front
+                topologyKey: topology.kubernetes.io/zone

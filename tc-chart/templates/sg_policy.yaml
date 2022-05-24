@@ -1,0 +1,36 @@
+{{- $fullName := include "tc-server.fullname" $ -}}
+{{- if .Values.securityGroups.server -}}
+apiVersion: vpcresources.k8s.aws/v1beta1
+kind: SecurityGroupPolicy
+metadata:
+  name: {{ $fullName }}-server
+  labels:
+    {{- include "tc-server.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+spec:
+  podSelector: 
+    matchLabels:
+      {{- include "tc-server.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/app: {{  include "tc-server.fullname" . }}-server
+  securityGroups:
+    groupIds:
+      - {{ .Values.securityGroups.server }}
+---
+{{- end -}}
+{{- if .Values.securityGroups.agents -}}
+apiVersion: vpcresources.k8s.aws/v1beta1
+kind: SecurityGroupPolicy
+metadata:
+  name: {{ $fullName }}-agents
+  labels:
+    {{- include "tc-server.labels" . | nindent 4 }}
+spec:
+  podSelector: 
+    matchLabels:
+      {{- include "tc-server.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: agent
+  securityGroups:
+    groupIds:
+      - {{ .Values.securityGroups.agents }}
+{{- end -}}

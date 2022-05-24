@@ -1,0 +1,17 @@
+{{- $fullName := include "tc-server.fullname" . -}}
+{{- if not .Values.persistency.data.claimName -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "tc-server.labels" $ | nindent 4 }}
+spec:
+  {{- with $.Values.persistency.data }}
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .storageClassName }}
+  resources:
+  {{- toYaml .resources | nindent 4 }}
+  {{- end }}
+{{- end -}}

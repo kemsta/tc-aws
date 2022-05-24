@@ -99,3 +99,9 @@ variable "ebs_csi_driver_version" {
   type    = string
   default = "v1.6.1-eksbuild.1"
 }
+
+variable "hostname" {
+  type        = string
+  default = "example.local"
+  description = "Root hostname for application"
+}

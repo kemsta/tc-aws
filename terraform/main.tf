@@ -59,3 +59,38 @@ module "security" {
   postgres_sg_id = module.storage.postgres_sg_id
   efs_sg_id      = module.storage.efs_sg_id
 }
+
+
+data "aws_eks_cluster_auth" "this" {
+  name = local.cluster_name
+  depends_on = [
+    module.eks
+  ]
+}
+
+data "aws_eks_cluster" "this" {
+  name = local.cluster_name
+  depends_on = [
+    module.eks
+  ]
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.this.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.this.token
+  }
+}
+
+module "application" {
+  source         = "./modules/application"
+  stage_tag      = var.stage_tag
+  cluster_name   = local.cluster_name
+  agent_pods_sg  = module.security.agent_pods_sg
+  server_pods_sg = module.security.server_pods_sg
+  hostname       = var.hostname
+  depends_on = [
+    module.eks
+  ]
+}

@@ -1,0 +1,67 @@
+{{- $fullName := include "tc-server.fullname" . -}}
+{{- $dnsSearch := printf "%s.%s.%s"  (include "tc-server.fullname" .) .Release.Namespace "svc.cluster.local" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-front
+  labels:
+    {{- include "tc-server.labels" . | nindent 4 }}
+data:
+  haproxy.cfg: |
+    defaults
+    mode http
+    timeout connect 200ms
+    timeout client 1200s
+    timeout server 1200s
+
+    resolvers dns
+        parse-resolv-conf
+        hold valid 5s
+
+    frontend http-in
+        bind *:80
+
+        stats enable
+        stats uri /healthz
+
+        default_backend web_endpoint
+        option httplog
+        log /dev/log local0 info
+
+        # Uncomment if logging to stdout is desired (e.g. when running in a containerized environment)
+        #log stdout local0  info
+
+        option http-buffer-request
+        declare capture request len 40000000
+        http-request capture req.body id 0
+        capture request header user-agent len 150
+        capture request header Host len 15
+
+        capture cookie X-TeamCity-Node-Id-Cookie= len 100
+
+        http-request add-header X-TeamCity-Proxy "type=haproxy; version={{ .Values.image.tag | default .Chart.AppVersion }}"
+        http-request set-header X-Forwarded-Host %[req.hdr(Host)]
+
+        acl is_build_agent hdr_beg(User-Agent) -i "TeamCity Agent"
+
+        use_backend agents_endpoint if is_build_agent
+        use_backend web_endpoint unless is_build_agent
+
+    backend agents_endpoint
+        acl cookie_found req.cook(X-TeamCity-Node-Id-Cookie) -m found
+        use-server MAIN_NODE unless cookie_found
+        cookie X-TeamCity-Node-Id-Cookie
+        {{- if .Values.initialized }}
+        option httpchk GET /app/rest/version
+        {{- end }}
+        server MAIN_NODE dev-tc-server-0.{{ $dnsSearch }}:8111 resolvers dns check inter 30s downinter 15s fall 4 rise 4 cookie dev-tc-server-0 init-addr last,libc,none
+        server SECONDARY_NODE dev-tc-server-1.{{ $dnsSearch }}:8111 resolvers dns check inter 30s downinter 15s fall 4 rise 4 cookie dev-tc-server-1 init-addr last,libc,none
+
+    backend web_endpoint
+        balance first 
+        {{- if .Values.initialized }}
+        option httpchk GET /app/rest/version
+        {{- end }}
+        server WEB_MAIN_NODE dev-tc-server-0.{{ $dnsSearch }}:8111 resolvers dns check inter 1s downinter 15s fall 4 rise 4 init-addr last,libc,none
+        server WEB_SECONDARY_NODE dev-tc-server-1.{{ $dnsSearch }}:8111 resolvers dns check inter 1s downinter 15s fall 4 rise 4 init-addr last,libc,none
+

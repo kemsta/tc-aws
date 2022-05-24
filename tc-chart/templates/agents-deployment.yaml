@@ -1,0 +1,26 @@
+{{- $fullName := include "tc-server.fullname" $ -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-agent
+  labels:
+    {{- include "tc-server.labels" . | nindent 4 }}
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      {{- include "tc-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: agent
+        {{- include "tc-server.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-agent
+          image: "{{ .Values.agent_image.repository }}:{{ .Values.agent_image.tag  | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.agent_image.pullPolicy }}

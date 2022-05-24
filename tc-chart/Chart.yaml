@@ -1,0 +1,9 @@
+apiVersion: v2
+name: tc-server
+description: TeamCity server helm chart
+
+type: application
+
+version: 0.1.0
+
+appVersion: "2022.04"

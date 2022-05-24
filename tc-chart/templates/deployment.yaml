@@ -1,0 +1,93 @@
+{{- $fullName := include "tc-server.fullname" $ -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "tc-server.labels" . | nindent 4 }}
+spec:
+  replicas: 2
+  serviceName: {{ $fullName }}
+  selector:
+    matchLabels:
+      {{- include "tc-server.selectorLabels" . | nindent 6 }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ $fullName }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.persistency.data.storageClassName }}
+      resources:
+        requests:
+          storage: 10Gi
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/app: {{  include "tc-server.fullname" . }}-server
+        {{- include "tc-server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "tc-server.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          volumeMounts:
+            - name: data-storage
+              mountPath: /data/teamcity_server/datadir
+            - name: {{ $fullName }}
+              mountPath: /data/teamcity_server/node
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8111
+              protocol: TCP
+          {{- if .Values.initialized }}
+          readinessProbe:
+            httpGet:
+              path: /app/rest/version
+              port: http
+          {{- end }}
+          env:
+          {{- if .Values.ingress.tls }}
+          - name: TEAMCITY_HTTPS_PROXY_ENABLED
+            value: true
+          {{- end }}
+          - name: TC_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: TEAMCITY_SERVER_OPTS
+            value: -Dteamcity.server.nodeId=$(TC_POD_NAME) -Dteamcity.node.data.path=/data/teamcity_server/node  -Dteamcity.data.path=/data/teamcity_server/datadir -Dteamcity.node.data.path=/data/teamcity_server/node -Dteamcity.server.rootURL={{ $.Values.ingress.host }}
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          {{- if .Values.persistency.data.claimName }}
+          claimName: {{ .Values.persistency.data.claimName }}
+          {{- else }}
+          claimName: {{ $fullName }}
+          {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/app
+                      operator: In
+                      values: 
+                      - {{  include "tc-server.fullname" . }}-server
+                topologyKey: topology.kubernetes.io/zone
