@@ -24,4 +24,9 @@ resource "helm_release" "teamcity" {
     name  = "ingress.host"
     value = var.hostname
   }
+
+  set {
+    name  = "initialized"
+    value = var.initialized
+  }
 }

@@ -14,8 +14,9 @@ resource "aws_db_instance" "this" {
   db_subnet_group_name   = aws_db_subnet_group.this.name
   vpc_security_group_ids = [aws_security_group.postgres.id]
 
-  username = "postgres"
+  username = var.db_username
   password = random_password.password.result
+  db_name  = var.db_username
 
   tags = var.default_tags
 

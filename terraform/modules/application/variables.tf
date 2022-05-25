@@ -31,3 +31,9 @@ variable "hostname" {
   type        = string
   description = "Root hostname for application"
 }
+
+variable "initialized" {
+  type        = bool
+  default     = false
+  description = "Switch on after application initialization"
+}

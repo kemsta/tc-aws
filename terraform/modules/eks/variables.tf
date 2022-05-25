@@ -84,3 +84,9 @@ variable "public_access_cidrs" {
   default     = ["0.0.0.0/0"]
   description = "List of CIDR blocks. Indicates which CIDR blocks can access the Amazon EKS public API server endpoint"
 }
+
+variable "namespace" {
+  type        = string
+  default     = "teamcity"
+  description = "Namespace name where will be installed teamcity server and agents"
+}

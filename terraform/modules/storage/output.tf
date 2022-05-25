@@ -22,3 +22,7 @@ output "efs_sg_id" {
 output "efs_id" {
   value = aws_efs_file_system.this.id
 }
+
+output "s3_user_key" {
+  value = aws_iam_access_key.s3_user_key
+}

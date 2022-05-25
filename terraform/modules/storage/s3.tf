@@ -29,3 +29,54 @@ resource "aws_s3_bucket_acl" "this" {
   bucket = aws_s3_bucket.this.bucket
   acl    = "private"
 }
+
+resource "aws_iam_user" "s3_user" {
+  name = "${var.stage_tag}-teamcity-s3-user"
+
+  tags = merge(var.default_tags, {
+    Name : "${var.stage_tag}-teamcity-s3-user"
+  })
+}
+
+resource "aws_iam_access_key" "s3_user_key" {
+  user = aws_iam_user.s3_user.name
+}
+
+resource "aws_iam_policy" "s3_user_policy" {
+  name = "${var.stage_tag}-teamcity-s3-user-policy"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "ListObjectsInBucket",
+        "Effect" : "Allow",
+        "Action" : ["s3:ListBucket"],
+        "Resource" : [aws_s3_bucket.this.arn]
+      },
+      {
+        "Sid" : "AllObjectActions",
+        "Effect" : "Allow",
+        "Action" : "s3:*Object",
+        "Resource" : ["${aws_s3_bucket.this.arn}/*"]
+      },
+      {
+        "Sid" : "BucketLocation",
+        "Effect" : "Allow",
+        "Action" : "s3:GetBucketLocation",
+        "Resource" : [aws_s3_bucket.this.arn]
+      },
+      {
+        "Sid" : "ListAllBuckets",
+        "Effect" : "Allow",
+        "Action" : "s3:ListAllMyBuckets",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "s3_user_policy_attach" {
+  user       = aws_iam_user.s3_user.name
+  policy_arn = aws_iam_policy.s3_user_policy.arn
+}

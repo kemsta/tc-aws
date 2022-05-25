@@ -113,3 +113,60 @@ resource "aws_iam_role_policy_attachment" "node-AmazonEC2ContainerRegistryReadOn
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.node.name
 }
+
+resource "aws_iam_user" "agent_user" {
+  name = "${var.stage_tag}-eks-agent-runner"
+
+  tags = merge(var.default_tags, {
+    Name : "${var.stage_tag}-eks-node-iam-role"
+  })
+}
+
+resource "aws_iam_access_key" "agent_user_key" {
+  user = aws_iam_user.agent_user.name
+}
+
+resource "aws_iam_policy" "agent_runner_policy" {
+  name = "${var.stage_tag}-eks-agent-runner-policy"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "eks:DescribeCluster",
+          "eks:ListClusters"
+        ],
+        "Resource" : aws_eks_cluster.this.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "agent_runner_policy_attach" {
+  user       = aws_iam_user.agent_user.name
+  policy_arn = aws_iam_policy.agent_runner_policy.arn
+}
+
+resource "kubernetes_config_map_v1_data" "aws-auth" {
+  data = {
+    "mapRoles" = <<EOT
+- rolearn: ${aws_iam_role.node.arn}
+  username: system:node:{{EC2PrivateDNSName}}
+  groups:
+    - system:bootstrappers
+    - system:nodes
+EOT
+    "mapUsers" = <<EOT
+- userarn: ${aws_iam_user.agent_user.arn}
+  username: ${aws_iam_user.agent_user.name}
+EOT
+  }
+
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+  force = true
+}

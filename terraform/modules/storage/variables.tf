@@ -41,3 +41,9 @@ variable "db_instance_class" {
   default     = "db.t3.micro"
   description = "Instance class for database"
 }
+
+variable "db_username" {
+  type        = string
+  default     = "teamcity"
+  description = "Database username"
+}

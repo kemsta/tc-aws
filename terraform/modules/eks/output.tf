@@ -9,3 +9,7 @@ output "cluster_role_arn" {
 output "node_role_arn" {
   value = aws_iam_role.node.arn
 }
+
+output "agent_user_key" {
+  value = aws_iam_access_key.agent_user_key
+}

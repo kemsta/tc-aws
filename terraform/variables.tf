@@ -42,6 +42,12 @@ variable "db_instance_class" {
   description = "Instance class for database"
 }
 
+variable "db_username" {
+  type        = string
+  default     = "teamcity"
+  description = "Database username"
+}
+
 // eks part
 
 variable "kuber_version" {
@@ -102,6 +108,18 @@ variable "ebs_csi_driver_version" {
 
 variable "hostname" {
   type        = string
-  default = "example.local"
+  default     = "example.local"
   description = "Root hostname for application"
+}
+
+variable "initialized" {
+  type        = bool
+  default     = false
+  description = "Switch on after application initialization"
+}
+
+variable "namespace" {
+  type        = string
+  default     = "teamcity"
+  description = "Namespace name where will be installed teamcity server and agents"
 }

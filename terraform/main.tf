@@ -26,6 +26,7 @@ module "storage" {
   db_max_allocated_storage = var.db_max_allocated_storage
   db_engine_version        = var.db_engine_version
   db_instance_class        = var.db_instance_class
+  db_username              = var.db_username
 }
 
 module "eks" {
@@ -90,6 +91,8 @@ module "application" {
   agent_pods_sg  = module.security.agent_pods_sg
   server_pods_sg = module.security.server_pods_sg
   hostname       = var.hostname
+  initialized    = var.initialized
+  namespace      = var.namespace
   depends_on = [
     module.eks
   ]
