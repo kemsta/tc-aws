@@ -38,11 +38,8 @@ No modules.
 | [aws_iam_user.agent_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy_attachment.agent_runner_policy_attach](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy_attachment) | resource |
 | [helm_release.aws-efs-csi-driver](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [kubernetes_config_map_v1_data.aws-auth](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/config_map_v1_data) | resource |
 | [kubernetes_job.vpc-cni-set-env](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/job) | resource |
-| [kubernetes_role.agent_runner](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role) | resource |
 | [kubernetes_role.vpc-cni-deployment-patcher](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role) | resource |
-| [kubernetes_role_binding.agent_runner](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding) | resource |
 | [kubernetes_role_binding.vpc-cni-deployment-patcher](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding) | resource |
 | [kubernetes_service_account.vpc-cni-deployment-patcher](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [aws_eks_cluster_auth.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
@@ -73,6 +70,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_agent_user"></a> [agent\_user](#output\_agent\_user) | n/a |
 | <a name="output_agent_user_key"></a> [agent\_user\_key](#output\_agent\_user\_key) | n/a |
 | <a name="output_cluster"></a> [cluster](#output\_cluster) | n/a |
 | <a name="output_cluster_role_arn"></a> [cluster\_role\_arn](#output\_cluster\_role\_arn) | n/a |

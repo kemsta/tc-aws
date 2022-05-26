@@ -63,6 +63,7 @@
 |------|-------------|
 | <a name="output_agent_user_id"></a> [agent\_user\_id](#output\_agent\_user\_id) | n/a |
 | <a name="output_agent_user_secret"></a> [agent\_user\_secret](#output\_agent\_user\_secret) | n/a |
+| <a name="output_db_password"></a> [db\_password](#output\_db\_password) | n/a |
 | <a name="output_initialize"></a> [initialize](#output\_initialize) | n/a |
 | <a name="output_s3_user_id"></a> [s3\_user\_id](#output\_s3\_user\_id) | n/a |
 | <a name="output_s3_user_secret"></a> [s3\_user\_secret](#output\_s3\_user\_secret) | n/a |

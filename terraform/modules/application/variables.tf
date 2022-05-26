@@ -37,3 +37,18 @@ variable "initialized" {
   default     = false
   description = "Switch on after application initialization"
 }
+
+variable "agent_user_arn" {
+  type        = string
+  description = "Agent user arn"
+}
+
+variable "agent_user_name" {
+  type        = string
+  description = "Agent user name"
+}
+
+variable "node_role_arn" {
+  type        = string
+  description = "Node role arn"
+}

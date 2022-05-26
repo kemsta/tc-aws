@@ -20,6 +20,7 @@ spec:
         app.kubernetes.io/component: agent
         {{- include "tc-server.selectorLabels" . | nindent 8 }}
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: {{ .Chart.Name }}-agent
           image: "{{ .Values.agent_image.repository }}:{{ .Values.agent_image.tag  | default .Chart.AppVersion }}"

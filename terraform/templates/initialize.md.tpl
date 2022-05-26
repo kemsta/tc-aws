@@ -5,7 +5,7 @@ You need to do next steps for configuring application.
 Update `kubectl` config:  
 `aws eks update-kubeconfig --name ${cluster_name}`  
 
-Get the load balancer address and open it in the browser:  
+Get the load balancer address and open it in the browser(Hold on, DNS maybe have not been updated yett):  
 `kubectl get service -l app.kubernetes.io/instance=dev,app.kubernetes.io/name=tc-server -n ${namespace} -o jsonpath='{.items[*].status.loadBalancer.ingress[*].hostname}'`  
 
 Follow the instructions in your browser to set up the application.  
@@ -18,7 +18,7 @@ user:      ${db_username}
 password:  run `terraform output db_password`
 endpoint:  ${db_endpoint}  
 
-After initialization you should roll out the next release with intialized=true variable like `terraform apply --auto-approve -var initialized=true` or set it in your tfvars file. It will be enable health checks in application.
+After initialization you should roll out the next release with intialized=true variable like `terraform apply --auto-approve -var initialized=true` or set it in your tfvars file. It will enable health checks in application.
 
 Now you can configure TeamCity Server, set up s3 storage with credentials below, and do your things with it. 
 
@@ -31,7 +31,7 @@ For cloud profile possible to use params bellow:
 Kubernetes API server URL: ${eks_endpoint}
 Kubernetes namespace: ${namespace}
 Authentication strategy: Amazon EKS
-Access ID: ${access_id}
+Access ID: ${agent_access_id}
 Secret Key: run `terraform output agent_user_secret`
 Cluster name: ${cluster_name}
 Agent images from deployment template ${stage_tag}-tc-server-agent

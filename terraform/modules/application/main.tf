@@ -30,3 +30,28 @@ resource "helm_release" "teamcity" {
     value = var.initialized
   }
 }
+
+resource "kubernetes_config_map_v1_data" "aws-auth" {
+  depends_on = [
+    helm_release.teamcity
+  ]
+  data = {
+    "mapRoles" = <<EOT
+- rolearn: ${var.node_role_arn}
+  username: system:node:{{EC2PrivateDNSName}}
+  groups:
+    - system:bootstrappers
+    - system:nodes
+EOT
+    "mapUsers" = <<EOT
+- userarn: ${var.agent_user_arn}
+  username: ${var.agent_user_name}
+EOT
+  }
+
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+  force = true
+}

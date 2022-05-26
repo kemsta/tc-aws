@@ -13,3 +13,7 @@ output "node_role_arn" {
 output "agent_user_key" {
   value = aws_iam_access_key.agent_user_key
 }
+
+output "agent_user" {
+  value = aws_iam_user.agent_user
+}

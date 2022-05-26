@@ -103,54 +103,5 @@ resource "kubernetes_job" "vpc-cni-set-env" {
       }
     }
   }
-  wait_for_completion = true
-}
-
-resource "kubernetes_role" "agent_runner" {
-  depends_on = [
-    aws_eks_addon.vpc-cni
-  ]
-  metadata {
-    name      = "agent-runner"
-    namespace = var.namespace
-  }
-
-  rule {
-    api_groups = ["*"]
-    resources  = ["pods"]
-    verbs      = ["get", "list", "create", "delete"]
-  }
-  rule {
-    api_groups = ["*"]
-    resources  = ["deployments"]
-    verbs      = ["get", "list"]
-  }
-  rule {
-    api_groups     = [""]
-    resources      = ["namespaces"]
-    verbs          = ["get", "list"]
-    resource_names = [var.namespace]
-  }
-}
-
-resource "kubernetes_role_binding" "agent_runner" {
-  depends_on = [
-    aws_eks_addon.vpc-cni
-  ]
-  metadata {
-    name      = "agent-runner"
-    namespace = var.namespace
-  }
-
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Role"
-    name      = kubernetes_role.agent_runner.metadata[0].name
-  }
-
-  subject {
-    kind      = "User"
-    name      = aws_iam_user.agent_user.name
-    api_group = "rbac.authorization.k8s.io"
-  }
+  wait_for_completion = false
 }

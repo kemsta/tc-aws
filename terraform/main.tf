@@ -84,15 +84,24 @@ provider "helm" {
   }
 }
 
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.this.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.this.token
+}
+
 module "application" {
-  source         = "./modules/application"
-  stage_tag      = var.stage_tag
-  cluster_name   = local.cluster_name
-  agent_pods_sg  = module.security.agent_pods_sg
-  server_pods_sg = module.security.server_pods_sg
-  hostname       = var.hostname
-  initialized    = var.initialized
-  namespace      = var.namespace
+  source          = "./modules/application"
+  stage_tag       = var.stage_tag
+  cluster_name    = local.cluster_name
+  agent_pods_sg   = module.security.agent_pods_sg
+  server_pods_sg  = module.security.server_pods_sg
+  hostname        = var.hostname
+  initialized     = var.initialized
+  namespace       = var.namespace
+  agent_user_name = module.eks.agent_user.name
+  agent_user_arn  = module.eks.agent_user.arn
+  node_role_arn   = module.eks.node_role_arn
   depends_on = [
     module.eks
   ]

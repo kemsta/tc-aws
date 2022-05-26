@@ -148,25 +148,3 @@ resource "aws_iam_user_policy_attachment" "agent_runner_policy_attach" {
   user       = aws_iam_user.agent_user.name
   policy_arn = aws_iam_policy.agent_runner_policy.arn
 }
-
-resource "kubernetes_config_map_v1_data" "aws-auth" {
-  data = {
-    "mapRoles" = <<EOT
-- rolearn: ${aws_iam_role.node.arn}
-  username: system:node:{{EC2PrivateDNSName}}
-  groups:
-    - system:bootstrappers
-    - system:nodes
-EOT
-    "mapUsers" = <<EOT
-- userarn: ${aws_iam_user.agent_user.arn}
-  username: ${aws_iam_user.agent_user.name}
-EOT
-  }
-
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-  force = true
-}

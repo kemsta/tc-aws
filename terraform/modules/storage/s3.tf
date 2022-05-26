@@ -30,6 +30,7 @@ resource "aws_s3_bucket_acl" "this" {
   acl    = "private"
 }
 
+
 resource "aws_iam_user" "s3_user" {
   name = "${var.stage_tag}-teamcity-s3-user"
 
